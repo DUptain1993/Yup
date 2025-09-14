@@ -1,5 +1,34 @@
 import sys
 import pefile
+import struct
+
+def add_resource(pe, data, type_id, id, language=0x0409):  # 0x0409 is English (United States)
+    # Find the resource directory
+    resource_dir = pe.get_directory_entry(pe.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_RESOURCE'])
+    if not resource_dir:
+        raise ValueError("No resource directory found")
+
+    # Create a new resource entry
+    resource_entry = pefile.RESOURCE_ENTRY()
+    resource_entry.id = id
+    resource_entry.offset_to_data = 0
+    resource_entry.data.is_directory = False
+    resource_entry.data.language = language
+    resource_entry.data.offset_to_data = len(pe.write())  # Placeholder for the actual offset
+
+    # Add the new resource entry to the resource directory
+    resource_dir.entries.append(resource_entry)
+
+    # Update the resource directory size
+    resource_dir.size += pefile.RESOURCE_ENTRY.size
+
+    # Write the resource data to the end of the file
+    pe.write(data, offset=resource_dir.entries[-1].offset_to_data)
+
+    # Update the resource entry offset to data
+    resource_dir.entries[-1].offset_to_data = pe.get_offset_from_rva(resource_dir.entries[-1].offset_to_data)
+
+    return pe
 
 def embed_executable(target_exe, embedded_exe):
     # Read the target executable
@@ -14,7 +43,7 @@ def embed_executable(target_exe, embedded_exe):
         embedded_data = f.read()
 
     # Add the embedded executable as a resource
-    pe.add_resource_data(pe.RESOURCE_TYPE['RT_RCDATA'], 1033, embedded_data)
+    pe = add_resource(pe, embedded_data, pefile.RESOURCE_TYPE['RT_RCDATA'], 1033)
 
     # Write the modified PE data back to a new file
     modified_exe = target_exe.replace('.exe', '_modified.exe')
