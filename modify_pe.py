@@ -15,24 +15,25 @@ def add_resource(pe, data, type_id, id, language=0x0409):  # 0x0409 is English (
     resource_dir = pe.DIRECTORY_ENTRY_RESOURCE.struct
 
     # Create a new resource entry
-    resource_entry = pefile.RESOURCE_ENTRY()
-    resource_entry.id = id
-    resource_entry.offset_to_data = 0
-    resource_entry.data.is_directory = False
-    resource_entry.data.language = language
-    resource_entry.data.offset_to_data = len(pe.write())  # Placeholder for the actual offset
+    resource_entry = pefile.DIRECTORY_ENTRY(['IMAGE_RESOURCE_DIRECTORY_ENTRY'])
+    resource_entry.struct.Id = id
+    resource_entry.struct.OffsetToData = 0
+    resource_entry.struct.DataIsDirectory = False
+    resource_entry.struct.CodePage = language
+    resource_entry.struct.Reserved = 0
+    resource_entry.struct.OffsetToData = len(pe.write())  # Placeholder for the actual offset
 
     # Add the new resource entry to the resource directory
     resource_dir.entries.append(resource_entry)
 
     # Update the resource directory size
-    resource_dir.size += pefile.RESOURCE_ENTRY.size
+    resource_dir.size += pefile.DIRECTORY_ENTRY(['IMAGE_RESOURCE_DIRECTORY_ENTRY']).size
 
     # Write the resource data to the end of the file
-    pe.write(data, offset=resource_dir.entries[-1].offset_to_data)
+    pe.write(data, offset=resource_dir.entries[-1].OffsetToData)
 
     # Update the resource entry offset to data
-    resource_dir.entries[-1].offset_to_data = pe.get_offset_from_rva(resource_dir.entries[-1].offset_to_data)
+    resource_dir.entries[-1].OffsetToData = pe.get_offset_from_rva(resource_dir.entries[-1].OffsetToData)
 
     return pe
 
