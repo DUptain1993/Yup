@@ -3,10 +3,16 @@ import pefile
 import struct
 
 def add_resource(pe, data, type_id, id, language=0x0409):  # 0x0409 is English (United States)
-    # Find the resource directory
-    resource_dir = pe.get_directory_entry(pe.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_RESOURCE'])
-    if not resource_dir:
-        raise ValueError("No resource directory found")
+    # Ensure the resource directory exists
+    if pe.DIRECTORY_ENTRY_RESOURCE is None:
+        pe.DIRECTORY_ENTRY_RESOURCE = pefile.DIRECTORY_ENTRY(['IMAGE_DIRECTORY_ENTRY_RESOURCE'])
+        pe.DIRECTORY_ENTRY_RESOURCE.struct = pefile.RESOURCE_DIRECTORY()
+        pe.DIRECTORY_ENTRY_RESOURCE.struct.NumberOfNamedEntries = 0
+        pe.DIRECTORY_ENTRY_RESOURCE.struct.NumberOfIdEntries = 0
+        pe.DIRECTORY_ENTRY_RESOURCE.pointer_to_raw_data = len(pe.write())
+        pe.DIRECTORY_ENTRY_RESOURCE.size = pefile.RESOURCE_DIRECTORY().size
+
+    resource_dir = pe.DIRECTORY_ENTRY_RESOURCE.struct
 
     # Create a new resource entry
     resource_entry = pefile.RESOURCE_ENTRY()
