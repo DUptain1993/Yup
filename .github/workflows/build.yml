@@ -36,7 +36,7 @@ jobs:
 
     - name: Pack the executable with UPX
       run: |
-        .\upx-4.0.2-win64\upx.exe output\phantomnet-client.exe
+        .\upx-4.0.2-win64\upx.exe --force output\phantomnet-client.exe
 
     - name: Embed the executable into AdobePro.exe
       run: |
