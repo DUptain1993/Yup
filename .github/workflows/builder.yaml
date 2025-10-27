@@ -1,3 +1,5 @@
+version: '3.0'
+
 tasks:
   generate_receipt:
     action: generate_image
