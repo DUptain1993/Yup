@@ -38,7 +38,7 @@ tasks:
           advertised: "3.88"
           coupon: "10.00"
           total: "16.25"
-         survey_info:
+        survey_info:
           number: "1-888-424-1018"
           website: "WWW.WALGREENSSATISFACTION.COM"
         store_info:
