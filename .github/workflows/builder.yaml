@@ -12,7 +12,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Generate receipt image
         id: generate_receipt
@@ -68,7 +68,7 @@ jobs:
           echo "final_receipt=receipt_edited.png" >> $GITHUB_OUTPUT
       
       - name: Upload receipt artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: receipt-output
           path: ${{ steps.edit_receipt.outputs.final_receipt }}
