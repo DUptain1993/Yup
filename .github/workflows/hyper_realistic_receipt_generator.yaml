@@ -1,0 +1,437 @@
+# Hyper-Realistic Receipt Generator
+# Combines structured data generation with realistic receipt templates
+version: '4.0'
+
+# Configuration for realistic data generation
+config:
+  date_range:
+    start: "2024-01-01"
+    end: "2025-12-31"
+  time_range:
+    start: "06:00"
+    end: "23:59"
+  tax_rates:
+    default: 8.25
+    by_state:
+      CA: 8.25
+      NY: 8.00
+      TX: 6.25
+      FL: 6.00
+      IL: 6.25
+      PA: 6.00
+      OH: 5.75
+      GA: 4.00
+      NC: 4.75
+      MI: 6.00
+
+# Store templates with realistic data
+store_templates:
+  walgreens:
+    name: "Walgreens"
+    logo: "WALGREENS"
+    address_format: "{street_number} {street_name} {city}, {state} {zip}"
+    phone_format: "({area_code}){exchange}-{number}"
+    store_number_format: "#{store_id}"
+    cashier_greeting: "I'm {cashier_name}. Thank you for allowing me to serve you today."
+    transaction_id_format: "{store_id}-{sequence}-{date_code}-{time_code}-{check_digit}"
+    payment_methods: ["DEBIT CARD", "CREDIT CARD", "CASH", "WALGREENS CARD", "APPLE PAY", "GOOGLE PAY"]
+    survey_info:
+      number: "1-888-424-1018"
+      website: "WWW.WALGREENSSATISFACTION.COM"
+    footer_message: "THANK YOU FOR FASTER SERVICE, CALL IN YOUR LIN PRESCRIPTION ORDER OR PLACE IT ON WWW.WALGREENS.COM 24 HOURS IN ADVANCE"
+    
+  cvs:
+    name: "CVS Pharmacy"
+    logo: "CVS"
+    address_format: "{street_number} {street_name} {city}, {state} {zip}"
+    phone_format: "({area_code}){exchange}-{number}"
+    store_number_format: "Store #{store_id}"
+    cashier_greeting: "Thank you for shopping at CVS Pharmacy"
+    transaction_id_format: "{store_id}{date_code}{time_code}{sequence}"
+    payment_methods: ["DEBIT CARD", "CREDIT CARD", "CASH", "CVS CARD", "APPLE PAY", "GOOGLE PAY"]
+    survey_info:
+      number: "1-800-SHOP-CVS"
+      website: "WWW.CVS.COM/SURVEY"
+    footer_message: "SAVE 20% ON YOUR NEXT PURCHASE WITH CVS CARD. SIGN UP TODAY!"
+    
+  target:
+    name: "Target"
+    logo: "TARGET"
+    address_format: "{street_number} {street_name} {city}, {state} {zip}"
+    phone_format: "({area_code}){exchange}-{number}"
+    store_number_format: "T-{store_id}"
+    cashier_greeting: "Thank you for shopping at Target"
+    transaction_id_format: "{store_id}-{date_code}-{time_code}-{sequence}"
+    payment_methods: ["DEBIT CARD", "CREDIT CARD", "CASH", "TARGET REDCARD", "APPLE PAY", "GOOGLE PAY"]
+    survey_info:
+      number: "1-800-440-0680"
+      website: "WWW.TARGET.COM/SURVEY"
+    footer_message: "SAVE 5% WITH TARGET REDCARD. APPLY TODAY!"
+
+# Product categories with realistic items
+product_categories:
+  pharmacy:
+    - name: "SYSTANE LUBRICANT EYE DROPS"
+      base_price_range: [8.99, 29.99]
+      common_discounts: ["$3 off 1", "$5 off 2", "$8 off 2"]
+    - name: "IBGARD 48ct"
+      base_price_range: [24.99, 34.99]
+      common_discounts: ["$5 off 1", "$8 off 2"]
+    - name: "BIOTRUE 2x10 oz"
+      base_price_range: [4.99, 8.99]
+      common_discounts: ["$2 off 1", "$4 off 2"]
+    - name: "FLORASTOR PROBIOTICS"
+      base_price_range: [39.99, 59.99]
+      common_discounts: ["$8 off 1", "$15 off 2"]
+    - name: "BOOST ADVANCED NUTRITION"
+      base_price_range: [9.99, 15.99]
+      common_discounts: ["$2 off 1", "$4 off 2"]
+    - name: "TYLENOL EXTRA STRENGTH"
+      base_price_range: [6.99, 12.99]
+      common_discounts: ["$2 off 1", "$3 off 2"]
+    - name: "ADVIL LIQUI-GELS"
+      base_price_range: [7.99, 14.99]
+      common_discounts: ["$2 off 1", "$4 off 2"]
+    - name: "CLARITIN 24HR"
+      base_price_range: [12.99, 19.99]
+      common_discounts: ["$3 off 1", "$5 off 2"]
+    - name: "ZYRTEC 24HR"
+      base_price_range: [14.99, 22.99]
+      common_discounts: ["$3 off 1", "$5 off 2"]
+    - name: "VITAMIN D3 1000IU"
+      base_price_range: [8.99, 16.99]
+      common_discounts: ["$2 off 1", "$4 off 2"]
+
+  grocery:
+    - name: "ORGANIC BANANAS"
+      base_price_range: [1.99, 3.99]
+      unit: "lb"
+      common_discounts: ["$0.50 off 2 lbs"]
+    - name: "WHOLE MILK GALLON"
+      base_price_range: [3.49, 4.99]
+      common_discounts: ["$0.50 off 2"]
+    - name: "EGGS DOZEN"
+      base_price_range: [2.99, 4.99]
+      common_discounts: ["$0.50 off 2 dozen"]
+    - name: "BREAD WHOLE WHEAT"
+      base_price_range: [2.49, 4.99]
+      common_discounts: ["$0.50 off 2"]
+    - name: "CHICKEN BREAST"
+      base_price_range: [4.99, 7.99]
+      unit: "lb"
+      common_discounts: ["$1 off 3 lbs"]
+    - name: "GROUND BEEF"
+      base_price_range: [5.99, 8.99]
+      unit: "lb"
+      common_discounts: ["$1 off 2 lbs"]
+    - name: "SALMON FILLET"
+      base_price_range: [8.99, 14.99]
+      unit: "lb"
+      common_discounts: ["$2 off 1 lb"]
+    - name: "AVOCADOS"
+      base_price_range: [1.99, 3.99]
+      unit: "each"
+      common_discounts: ["$0.50 off 3"]
+    - name: "SPINACH ORGANIC"
+      base_price_range: [2.99, 4.99]
+      common_discounts: ["$0.50 off 2"]
+    - name: "GREEK YOGURT"
+      base_price_range: [4.99, 7.99]
+      common_discounts: ["$1 off 2"]
+
+  household:
+    - name: "PAPER TOWELS 6-PACK"
+      base_price_range: [8.99, 14.99]
+      common_discounts: ["$2 off 1", "$3 off 2"]
+    - name: "TOILET PAPER 12-PACK"
+      base_price_range: [12.99, 19.99]
+      common_discounts: ["$2 off 1", "$4 off 2"]
+    - name: "LAUNDRY DETERGENT"
+      base_price_range: [6.99, 12.99]
+      common_discounts: ["$1 off 1", "$2 off 2"]
+    - name: "DISH SOAP"
+      base_price_range: [2.99, 5.99]
+      common_discounts: ["$0.50 off 2"]
+    - name: "TRASH BAGS"
+      base_price_range: [4.99, 9.99]
+      common_discounts: ["$1 off 1", "$2 off 2"]
+    - name: "CLEANING WIPES"
+      base_price_range: [3.99, 7.99]
+      common_discounts: ["$1 off 2"]
+    - name: "AIR FRESHENER"
+      base_price_range: [2.99, 6.99]
+      common_discounts: ["$1 off 2"]
+    - name: "BATTERIES AA 8-PACK"
+      base_price_range: [6.99, 11.99]
+      common_discounts: ["$2 off 1"]
+    - name: "LIGHT BULBS LED"
+      base_price_range: [4.99, 9.99]
+      common_discounts: ["$1 off 2"]
+    - name: "FIRST AID KIT"
+      base_price_range: [8.99, 15.99]
+      common_discounts: ["$2 off 1"]
+
+# Realistic address data
+addresses:
+  california:
+    - street: "1625 W SUNSET BLVD"
+      city: "LOS ANGELES"
+      state: "CA"
+      zip: "90026"
+      area_code: "213"
+    - street: "1234 MAIN ST"
+      city: "SAN FRANCISCO"
+      state: "CA"
+      zip: "94102"
+      area_code: "415"
+    - street: "5678 OCEAN DR"
+      city: "SAN DIEGO"
+      state: "CA"
+      zip: "92101"
+      area_code: "619"
+  new_york:
+    - street: "789 BROADWAY"
+      city: "NEW YORK"
+      state: "NY"
+      zip: "10003"
+      area_code: "212"
+    - street: "456 5TH AVE"
+      city: "NEW YORK"
+      state: "NY"
+      zip: "10018"
+      area_code: "212"
+  texas:
+    - street: "321 MAIN ST"
+      city: "HOUSTON"
+      state: "TX"
+      zip: "77002"
+      area_code: "713"
+    - street: "654 ELM ST"
+      city: "DALLAS"
+      state: "TX"
+      zip: "75201"
+      area_code: "214"
+
+# Cashier names (realistic variety)
+cashiers:
+  - "JOSEPH"
+  - "MARIA"
+  - "JAMES"
+  - "SOPHIA"
+  - "MICHAEL"
+  - "EMMA"
+  - "WILLIAM"
+  - "OLIVIA"
+  - "DAVID"
+  - "AVA"
+  - "ROBERT"
+  - "ISABELLA"
+  - "RICHARD"
+  - "CHARLOTTE"
+  - "CHARLES"
+  - "AMELIA"
+  - "JOSEPH"
+  - "MIA"
+  - "THOMAS"
+  - "HARPER"
+
+# Receipt generation tasks
+tasks:
+  generate_random_receipt:
+    action: generate_receipt
+    params:
+      store_template: "walgreens"  # Can be walgreens, cvs, or target
+      randomize_data: true
+      item_count:
+        min: 3
+        max: 12
+      include_coupons: true
+      include_cash_back: true
+      include_survey: true
+      date_range:
+        start: "2024-01-01"
+        end: "2025-12-31"
+      time_range:
+        start: "06:00"
+        end: "23:59"
+
+  generate_specific_receipt:
+    action: generate_receipt
+    params:
+      store_template: "walgreens"
+      custom_data:
+        store_name: "Walgreens"
+        address: "1625 W SUNSET BLVD LOS ANGELES, CA 90026"
+        phone: "(213)482-9283"
+        store_id: "9136"
+        date: "10/25/2025"
+        time: "12:38 PM"
+        cashier: "JOSEPH"
+        transaction_id: "0913-6279-2897-0704-2420-17"
+        items:
+          - name: "SYSTANE LUBRICANT EYE DROPS"
+            price: 26.99
+            quantity: 1
+            discount: "$8 off 2 coupon"
+          - name: "IBGARD 48ct"
+            price: 29.99
+            quantity: 1
+            discount: "$5 off 1 coupon"
+          - name: "BIOTRUE 2x10 oz"
+            price: 6.00
+            quantity: 1
+            discount: "$6 off 1 coupon"
+          - name: "FLORASTOR PROBIOTICS"
+            price: 49.99
+            quantity: 1
+            discount: "$8 off 1 coupon"
+          - name: "BOOST ADVANCED NUTRITION"
+            price: 12.99
+            quantity: 1
+            discount: "$4 off 1 coupon"
+        subtotal: 125.96
+        tax_rate: 8.25
+        tax_amount: 5.77
+        total: 131.73
+        payment_method: "DEBIT CARD"
+        cash_back: 70.75
+        savings:
+          advertised: 3.88
+          coupon: 10.00
+          total: 16.25
+        card_number: "******4015"
+
+  generate_batch_receipts:
+    action: generate_receipt_batch
+    params:
+      count: 10
+      store_templates: ["walgreens", "cvs", "target"]
+      randomize_stores: true
+      item_count:
+        min: 2
+        max: 8
+      date_range:
+        start: "2024-01-01"
+        end: "2024-12-31"
+      output_format: "individual_files"
+      file_prefix: "receipt_"
+
+# Receipt validation rules
+validation:
+  price_ranges:
+    min_item_price: 0.99
+    max_item_price: 199.99
+    min_total: 1.00
+    max_total: 999.99
+  quantity_ranges:
+    min_quantity: 1
+    max_quantity: 10
+  discount_ranges:
+    min_discount: 0.50
+    max_discount: 50.00
+    max_discount_percentage: 50
+  tax_calculation:
+    precision: 2
+    rounding: "round_half_up"
+  transaction_id:
+    format_validation: true
+    checksum_validation: true
+
+# Output formatting options
+output:
+  formats:
+    - name: "yaml"
+      description: "Structured YAML data"
+      file_extension: ".yaml"
+    - name: "json"
+      description: "JSON format for API integration"
+      file_extension: ".json"
+    - name: "csv"
+      description: "CSV format for spreadsheet analysis"
+      file_extension: ".csv"
+    - name: "text"
+      description: "Plain text receipt format"
+      file_extension: ".txt"
+    - name: "html"
+      description: "HTML receipt for web display"
+      file_extension: ".html"
+  
+  image_generation:
+    enabled: true
+    resolution: "300dpi"
+    width: "80mm"
+    height: "auto"
+    font_family: "monospace"
+    font_size: 10
+    line_spacing: 1.2
+    margins:
+      top: 5
+      bottom: 5
+      left: 3
+      right: 3
+
+# Advanced features
+advanced:
+  realistic_timing:
+    enabled: true
+    peak_hours: ["07:00-09:00", "12:00-14:00", "17:00-19:00"]
+    off_peak_hours: ["22:00-06:00"]
+    weekend_adjustments: true
+  
+  seasonal_adjustments:
+    enabled: true
+    holiday_items:
+      - name: "HALLOWEEN CANDY"
+        seasonal: true
+        months: [9, 10]
+      - name: "CHRISTMAS DECORATIONS"
+        seasonal: true
+        months: [11, 12]
+      - name: "VALENTINE'S CANDY"
+        seasonal: true
+        months: [1, 2]
+      - name: "EASTER CANDY"
+        seasonal: true
+        months: [3, 4]
+  
+  coupon_logic:
+    enabled: true
+    manufacturer_coupons: true
+    store_coupons: true
+    digital_coupons: true
+    loyalty_discounts: true
+    bulk_discounts: true
+  
+  payment_methods:
+    realistic_distribution:
+      debit_card: 45
+      credit_card: 30
+      cash: 15
+      mobile_pay: 8
+      store_card: 2
+  
+  cash_back_logic:
+    enabled: true
+    max_cash_back: 100.00
+    common_amounts: [5.00, 10.00, 20.00, 40.00, 60.00, 80.00, 100.00]
+    debit_card_only: true
+
+# Quality assurance
+quality_checks:
+  price_consistency: true
+  tax_calculation_accuracy: true
+  total_verification: true
+  discount_validation: true
+  date_time_realism: true
+  address_formatting: true
+  phone_number_formatting: true
+  transaction_id_uniqueness: true
+
+# Export options
+export:
+  batch_processing: true
+  parallel_generation: true
+  compression: true
+  metadata_inclusion: true
+  audit_trail: true
+  version_tracking: true
