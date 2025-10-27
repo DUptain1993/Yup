@@ -1,0 +1,74 @@
+version: '3.0'
+
+tasks:
+  generate_receipt:
+    action: generate_image
+    params:
+      template: walgreens_receipt
+      data:
+        store_name: "Walgreens"
+        address: "1625 W SUNSET BLVD LOS ANGELES, CA"
+        date: "10/25/2025"
+        time: "12:38 PM"
+        transaction_id: "0913-6279-2897-0704-2420-17"
+        cashier_name: "JOSEPH"
+        items:
+          - name: "SYSTANE LUBRICANT EYE"
+            price: "26.99"
+            discount: "$8 off 2 coupon"
+          - name: "IBGARD 48ct"
+            price: "29.99"
+            discount: "$5 off 1 coupon"
+          - name: "BIOTRUE 2x10 oz"
+            price: "6.00"
+            discount: "$6 off 1 coupon"
+          - name: "FLORASTOR"
+            price: "49.99"
+            discount: "$8 off 1 coupon"
+          - name: "BOOST ADVAN"
+            price: "12.99"
+            discount: "$4 off 1 coupon"
+        subtotal: "125.96"
+        tax_rate: "8.25%"
+        tax_amount: "5.77"
+        total: "131.73"
+        payment_method: "DEBIT CARD"
+        cash_back: "70.75"
+        savings:
+          advertised: "3.88"
+          coupon: "10.00"
+          total: "16.25"
+         survey_info:
+          number: "1-888-424-1018"
+          website: "WWW.WALGREENSSATISFACTION.COM"
+        store_info:
+          number: "WALGREENS #9136 SEO# 913627052"
+          sequence: "SEQ#913627052 PAYMENT FROM PRIMARY"
+          card: "******4015"
+        message: "THANK YOU FOR FASTER SERVICE, CALL IN YOUR LIN PRESCRIPTION ORDER OR PLACE IT ON WWW.WALGREENS.COM 24 HOURS IN ADVANCE"
+
+  edit_receipt_data:
+    action: edit_text
+    params:
+      image: "{generate_receipt.output}"
+      editable_fields:
+        - "store_name"
+        - "address"
+        - "date"
+        - "time"
+        - "transaction_id"
+        - "cashier_name"
+        - "items"
+        - "subtotal"
+        - "tax_rate"
+        - "tax_amount"
+        - "total"
+        - "payment_method"
+        - "cash_back"
+        - "savings"
+        - "survey_info"
+        - "store_info"
+        - "message"
+
+output:
+  image: "{edit_receipt_data.output}"
